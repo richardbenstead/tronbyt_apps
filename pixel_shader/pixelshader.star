@@ -17,7 +17,7 @@ def hex_map(r, g, b, a = 15):
 
     return mapping[r] + mapping[g] + mapping[b] + mapping[a]
 
-def get_rectangle1(row, col, frame_num):
+def pix_wipe(row, col, frame_num):
     frame_num *= 2
 
     alpha = 15 + 10 * math.sin((frame_num*1.2 + row + col) / 30)
@@ -28,7 +28,7 @@ def get_rectangle1(row, col, frame_num):
 
     return render.Box(width = 1, height = 1, color = hex_map(r, g, b, alpha))
 
-def get_rectangle2(row, col, frame_num):
+def pix_dots(row, col, frame_num):
     # Every nth column, every nth row, moving left
     star = (((col + frame_num//2) % 16 == 0) and (row % 8 == 0))
     r = 15 if star else 2
@@ -37,7 +37,7 @@ def get_rectangle2(row, col, frame_num):
     a = 15 if star else 6
     return render.Box(width=1, height=1, color=hex_map(r, g, b, a))
 
-def get_rectangle3(row, col, frame_num):
+def pix_plasma(row, col, frame_num):
     v = (
         math.sin(row/4.0 + frame_num/16.0)
         + math.sin(col/6.0 + frame_num/12.0)
@@ -51,7 +51,7 @@ def get_rectangle3(row, col, frame_num):
     a = 10 + int(5 * v)
     return render.Box(width=1, height=1, color=hex_map(r, g, b, a))
 
-def get_rectangle4(row, col, frame_num):
+def pix_trongrid(row, col, frame_num):
     horizon = num_rows // 2
     fade = max(0, 1 - (row / horizon))
     # moving horizontal lines
@@ -65,7 +65,7 @@ def get_rectangle4(row, col, frame_num):
     return render.Box(width=1, height=1, color=hex_map(r, g, b, a))
 
 
-def get_rectangle(row, col, frame_num):
+def pix_cloud(row, col, frame_num):
     # Simulate moving through 3D clouds: combine sine/cosine waves with parallax
     time = frame_num / 40.0
     x = col / 8.0 + time
@@ -88,8 +88,10 @@ def get_rectangle(row, col, frame_num):
 
 def render_grid(frame_num):
     rows = []
+
+    shader_fn = pix_cloud
     for grid_row in range(num_rows):
-        rows.append(render.Row([get_rectangle(grid_row, grid_col, frame_num) for grid_col in range(num_cols)]))
+        rows.append(render.Row([shader_fn(grid_row, grid_col, frame_num) for grid_col in range(num_cols)]))
 
     return render.Column(rows)
 
